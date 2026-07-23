@@ -37,15 +37,16 @@ int readInteger();
 void readString(char *buffer, int size);
 int parseSeat(const char* seatStr, int *row, int *col);
 float calculatePrice(int row, int category, int numSeats);
+int containsIgnoreCase(const char *haystack, const char *needle);
 
 void viewMoviesAndShowtimes();
 void viewSeatMap();
 void bookATicket();
+void cancelBooking();
+void searchBooking();
 
-// Stubs for upcoming steps
-void cancelBooking() { printf("\n[Cancel Booking module coming soon!]\n"); }
-void searchBooking() { printf("\n[Search Booking module coming soon!]\n"); }
-void showRevenue() { printf("\n[Revenue Report module coming soon!]\n"); }
+// Stub for Wageesha's upcoming Revenue module
+void showRevenue() { printf("\n[Revenue Report module coming next!]\n"); }
 
 // --- Main Function ---
 int main() {
@@ -120,6 +121,22 @@ void readString(char *buffer, int size) {
     buffer[strcspn(buffer, "\n")] = 0; // Strip trailing newline
 }
 
+int containsIgnoreCase(const char *haystack, const char *needle) {
+    if (!*needle) return 1;
+    for (; *haystack; ++haystack) {
+        if (tolower((unsigned char)*haystack) == tolower((unsigned char)*needle)) {
+            const char *h = haystack + 1;
+            const char *n = needle + 1;
+            while (*h && *n && tolower((unsigned char)*h) == tolower((unsigned char)*n)) {
+                h++;
+                n++;
+            }
+            if (!*n) return 1;
+        }
+    }
+    return 0;
+}
+
 // --- System Initialization ---
 void initializeSystem() {
     strcpy(movies[0].title, "Inception");
@@ -184,7 +201,6 @@ int parseSeat(const char* seatStr, int *row, int *col) {
 float calculatePrice(int row, int category, int numSeats) {
     float basePrice = 1000.0f;
 
-    // Pricing Tier by Row
     if (row == 4) basePrice = 1800.0f;       // VIP (Row E)
     else if (row >= 2) basePrice = 1400.0f;  // Premium (Rows C, D)
     else basePrice = 1000.0f;               // Regular (Rows A, B)
@@ -415,4 +431,150 @@ void bookATicket() {
     printf("Total Cost:  Rs. %.2f\n", transactionTotal);
     printf("============================================\n");
     printf("Booking successful!\n");
+}
+
+// --- Menu Option 4: Cancel Booking ---
+void cancelBooking() {
+    int movieChoice, showChoice, row = -1, col = -1;
+    char seatInput[10];
+
+    printf("\n--- Select Movie for Cancellation ---\n");
+    for (int i = 0; i < NUM_MOVIES; i++) {
+        printf("%d. %s\n", i + 1, movies[i].title);
+    }
+    printf("Choose Movie (1-3): ");
+    movieChoice = readInteger();
+    if (movieChoice < 1 || movieChoice > 3) {
+        printf("Error: Invalid movie choice.\n");
+        return;
+    }
+
+    printf("\n--- Select Showtime ---\n");
+    for (int j = 0; j < NUM_SHOWTIMES; j++) {
+        printf("%d. %s\n", j + 1, movies[movieChoice - 1].showtimes[j].time);
+    }
+    printf("Choose Showtime (1-2): ");
+    showChoice = readInteger();
+    if (showChoice < 1 || showChoice > 2) {
+        printf("Error: Invalid showtime choice.\n");
+        return;
+    }
+
+    int mIdx = movieChoice - 1;
+    int sIdx = showChoice - 1;
+
+    printf("\nEnter Seat Code to Cancel (e.g. A3, E10): ");
+    readString(seatInput, 10);
+
+    if (!parseSeat(seatInput, &row, &col)) {
+        printf("Error: Invalid seat code format.\n");
+        return;
+    }
+
+    if (!movies[mIdx].showtimes[sIdx].seats[row][col].booked) {
+        printf("Notice: Seat %c%d is currently empty. Nothing to cancel.\n", 'A' + row, col + 1);
+        return;
+    }
+
+    float refund = movies[mIdx].showtimes[sIdx].seats[row][col].pricePaid;
+    char custName[50];
+    strcpy(custName, movies[mIdx].showtimes[sIdx].seats[row][col].customerName);
+
+    // Reset seat properties
+    movies[mIdx].showtimes[sIdx].seats[row][col].booked = 0;
+    strcpy(movies[mIdx].showtimes[sIdx].seats[row][col].customerName, "");
+    movies[mIdx].showtimes[sIdx].seats[row][col].pricePaid = 0.0f;
+    movies[mIdx].showtimes[sIdx].seats[row][col].customerType = 0;
+    strcpy(movies[mIdx].showtimes[sIdx].seats[row][col].bookingType, "");
+
+    printf("\n============================================\n");
+    printf("            CANCELLATION CONFIRMED          \n");
+    printf("============================================\n");
+    printf("Customer Name: %s\n", custName);
+    printf("Cancelled Seat:%c%d\n", 'A' + row, col + 1);
+    printf("Refund Amount: Rs. %.2f\n", refund);
+    printf("============================================\n");
+}
+
+// --- Menu Option 5: Search Booking ---
+void searchBooking() {
+    int searchChoice;
+    printf("\n--- Search Reservation ---\n");
+    printf("1. Search by Customer Name\n");
+    printf("2. Search by Seat Code\n");
+    printf("Choose Option (1-2): ");
+    searchChoice = readInteger();
+
+    if (searchChoice == 1) {
+        char nameQuery[50];
+        printf("\nEnter Customer Name (or part of name): ");
+        readString(nameQuery, 50);
+
+        int found = 0;
+        printf("\n========================================================================\n");
+        printf("                           SEARCH RESULTS                               \n");
+        printf("========================================================================\n");
+
+        for (int m = 0; m < NUM_MOVIES; m++) {
+            for (int s = 0; s < NUM_SHOWTIMES; s++) {
+                for (int r = 0; r < NUM_ROWS; r++) {
+                    for (int c = 0; c < NUM_COLS; c++) {
+                        if (movies[m].showtimes[s].seats[r][c].booked) {
+                            if (containsIgnoreCase(movies[m].showtimes[s].seats[r][c].customerName, nameQuery)) {
+                                printf("Customer: %-20s | Movie: %-15s | Time: %-8s | Seat: %c%-2d | Type: %s | Paid: Rs. %.2f\n",
+                                       movies[m].showtimes[s].seats[r][c].customerName,
+                                       movies[m].title,
+                                       movies[m].showtimes[s].time,
+                                       'A' + r, c + 1,
+                                       movies[m].showtimes[s].seats[r][c].bookingType,
+                                       movies[m].showtimes[s].seats[r][c].pricePaid);
+                                found = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!found) {
+            printf("No active reservations found for query: '%s'\n", nameQuery);
+        }
+        printf("========================================================================\n");
+
+    } else if (searchChoice == 2) {
+        char seatInput[10];
+        int row = -1, col = -1;
+        printf("\nEnter Seat Code (e.g. A3, E10): ");
+        readString(seatInput, 10);
+
+        if (!parseSeat(seatInput, &row, &col)) {
+            printf("Error: Invalid seat code format.\n");
+            return;
+        }
+
+        int found = 0;
+        printf("\n========================================================================\n");
+        printf("                     SEAT STATUS FOR %c%d                                \n", 'A' + row, col + 1);
+        printf("========================================================================\n");
+
+        for (int m = 0; m < NUM_MOVIES; m++) {
+            for (int s = 0; s < NUM_SHOWTIMES; s++) {
+                if (movies[m].showtimes[s].seats[row][col].booked) {
+                    printf("Movie: %-15s | Time: %-8s | Booked by: %-18s | Type: %s | Paid: Rs. %.2f\n",
+                           movies[m].title,
+                           movies[m].showtimes[s].time,
+                           movies[m].showtimes[s].seats[row][col].customerName,
+                           movies[m].showtimes[s].seats[row][col].bookingType,
+                           movies[m].showtimes[s].seats[row][col].pricePaid);
+                    found = 1;
+                } else {
+                    printf("Movie: %-15s | Time: %-8s | Status: [AVAILABLE]\n",
+                           movies[m].title,
+                           movies[m].showtimes[s].time);
+                }
+            }
+        }
+        printf("========================================================================\n");
+    } else {
+        printf("Error: Invalid choice.\n");
+    }
 }
