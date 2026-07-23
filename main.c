@@ -34,12 +34,15 @@ struct Movie movies[NUM_MOVIES];
 void displayMenu();
 void initializeSystem();
 int readInteger();
+void readString(char *buffer, int size);
 int parseSeat(const char* seatStr, int *row, int *col);
+float calculatePrice(int row, int category, int numSeats);
+
 void viewMoviesAndShowtimes();
 void viewSeatMap();
+void bookATicket();
 
 // Stubs for upcoming steps
-void bookATicket() { printf("\n[Book Ticket module coming next!]\n"); }
 void cancelBooking() { printf("\n[Cancel Booking module coming soon!]\n"); }
 void searchBooking() { printf("\n[Search Booking module coming soon!]\n"); }
 void showRevenue() { printf("\n[Revenue Report module coming soon!]\n"); }
@@ -112,6 +115,11 @@ int readInteger() {
     return val;
 }
 
+void readString(char *buffer, int size) {
+    fgets(buffer, size, stdin);
+    buffer[strcspn(buffer, "\n")] = 0; // Strip trailing newline
+}
+
 // --- System Initialization ---
 void initializeSystem() {
     strcpy(movies[0].title, "Inception");
@@ -157,7 +165,7 @@ int parseSeat(const char* seatStr, int *row, int *col) {
     }
 
     for (int i = 1; seatStr[i] != '\0'; i++) {
-        if (!isdigit(seatStr[i])) {
+        if (!isdigit((unsigned char)seatStr[i])) {
             return 0;
         }
     }
@@ -170,6 +178,24 @@ int parseSeat(const char* seatStr, int *row, int *col) {
     *row = rowLetter - 'A';
     *col = seatNumber - 1;
     return 1;
+}
+
+// --- Dynamic Price Calculator ---
+float calculatePrice(int row, int category, int numSeats) {
+    float basePrice = 1000.0f;
+
+    // Pricing Tier by Row
+    if (row == 4) basePrice = 1800.0f;       // VIP (Row E)
+    else if (row >= 2) basePrice = 1400.0f;  // Premium (Rows C, D)
+    else basePrice = 1000.0f;               // Regular (Rows A, B)
+
+    float discountPercent = 0.0f;
+    if (category == 2) discountPercent += 0.10f;      // Student 10%
+    else if (category == 3) discountPercent += 0.20f; // Senior Citizen 20%
+
+    if (numSeats >= 4) discountPercent += 0.10f;      // Group Discount 10%
+
+    return basePrice * (1.0f - discountPercent);
 }
 
 // --- View Option 1: Movie Catalog ---
@@ -240,4 +266,153 @@ void viewSeatMap() {
     printf("\n============================================================\n");
     printf(" LEGEND: [.] = Free | [X] = Booked\n");
     printf("============================================================\n");
+}
+
+// --- Menu Option 3: Book a Ticket ---
+void bookATicket() {
+    int movieChoice, showChoice, category, numSeats;
+    char custName[50];
+
+    printf("\n--- Select Movie ---\n");
+    for (int i = 0; i < NUM_MOVIES; i++) {
+        printf("%d. %s\n", i + 1, movies[i].title);
+    }
+    printf("Choose Movie (1-3): ");
+    movieChoice = readInteger();
+    if (movieChoice < 1 || movieChoice > 3) {
+        printf("Error: Invalid movie choice.\n");
+        return;
+    }
+
+    printf("\n--- Select Showtime ---\n");
+    for (int j = 0; j < NUM_SHOWTIMES; j++) {
+        printf("%d. %s\n", j + 1, movies[movieChoice - 1].showtimes[j].time);
+    }
+    printf("Choose Showtime (1-2): ");
+    showChoice = readInteger();
+    if (showChoice < 1 || showChoice > 2) {
+        printf("Error: Invalid showtime choice.\n");
+        return;
+    }
+
+    int mIdx = movieChoice - 1;
+    int sIdx = showChoice - 1;
+
+    printf("\nEnter Customer Name: ");
+    readString(custName, 50);
+
+    printf("\n--- Choose Customer Category ---\n");
+    printf("1. Regular\n");
+    printf("2. Student (10%% Discount)\n");
+    printf("3. Senior Citizen (20%% Discount)\n");
+    printf("Choose Category (1-3): ");
+    category = readInteger();
+    if (category < 1 || category > 3) {
+        printf("Error: Invalid category. Defaulting to Regular.\n");
+        category = 1;
+    }
+
+    printf("\nEnter number of seats to book: ");
+    numSeats = readInteger();
+    if (numSeats < 1) {
+        printf("Error: You must book at least 1 seat.\n");
+        return;
+    }
+
+    int availableSeats = 0;
+    for (int r = 0; r < NUM_ROWS; r++) {
+        for (int c = 0; c < NUM_COLS; c++) {
+            if (!movies[mIdx].showtimes[sIdx].seats[r][c].booked) {
+                availableSeats++;
+            }
+        }
+    }
+
+    if (numSeats > availableSeats) {
+        printf("Error: Only %d seats are left in this show.\n", availableSeats);
+        return;
+    }
+
+    int selectedRows[50];
+    int selectedCols[50];
+    char seatInput[10];
+
+    printf("\n--- Seat Selection ---\n");
+    printf("(10%% extra discount applies for Group bookings of 4 or more tickets!)\n");
+
+    for (int i = 0; i < numSeats; i++) {
+        int validSeat = 0;
+        int row = -1, col = -1;
+
+        while (!validSeat) {
+            printf("Enter Seat Code for ticket #%d (e.g. A3, E10): ", i + 1);
+            readString(seatInput, 10);
+
+            if (!parseSeat(seatInput, &row, &col)) {
+                printf("Error: Invalid seat code. Please use A-E for row and 1-10 for column.\n");
+                continue;
+            }
+
+            if (movies[mIdx].showtimes[sIdx].seats[row][col].booked) {
+                printf("Error: Seat %s has already been ticketed. Choose another seat.\n", seatInput);
+                continue;
+            }
+
+            int repeated = 0;
+            for (int k = 0; k < i; k++) {
+                if (selectedRows[k] == row && selectedCols[k] == col) {
+                    repeated = 1;
+                    break;
+                }
+            }
+            if (repeated) {
+                printf("Error: You already entered seat %s in this transaction!\n", seatInput);
+                continue;
+            }
+
+            selectedRows[i] = row;
+            selectedCols[i] = col;
+            validSeat = 1;
+        }
+    }
+
+    char discountStr[30];
+    if (category == 2) {
+        strcpy(discountStr, numSeats >= 4 ? "Student (Group)" : "Student");
+    } else if (category == 3) {
+        strcpy(discountStr, numSeats >= 4 ? "Senior Citizen (Group)" : "Senior Citizen");
+    } else {
+        strcpy(discountStr, numSeats >= 4 ? "Regular (Group)" : "Regular");
+    }
+
+    float transactionTotal = 0.0f;
+    printf("\n============================================\n");
+    printf("               BOOKING SUMMARY              \n");
+    printf("============================================\n");
+    printf("Customer Name: %s\n", custName);
+    printf("Movie:         %s\n", movies[mIdx].title);
+    printf("Showtime:      %s\n", movies[mIdx].showtimes[sIdx].time);
+    printf("Category:      %s\n", discountStr);
+    printf("--------------------------------------------\n");
+
+    for (int i = 0; i < numSeats; i++) {
+        int r = selectedRows[i];
+        int c = selectedCols[i];
+
+        float finalPrice = calculatePrice(r, category, numSeats);
+
+        movies[mIdx].showtimes[sIdx].seats[r][c].booked = 1;
+        strcpy(movies[mIdx].showtimes[sIdx].seats[r][c].customerName, custName);
+        movies[mIdx].showtimes[sIdx].seats[r][c].pricePaid = finalPrice;
+        movies[mIdx].showtimes[sIdx].seats[r][c].customerType = category;
+        strcpy(movies[mIdx].showtimes[sIdx].seats[r][c].bookingType, discountStr);
+
+        printf("Seat %c%d: Rs. %.2f\n", 'A' + r, c + 1, finalPrice);
+        transactionTotal += finalPrice;
+    }
+
+    printf("--------------------------------------------\n");
+    printf("Total Cost:  Rs. %.2f\n", transactionTotal);
+    printf("============================================\n");
+    printf("Booking successful!\n");
 }
