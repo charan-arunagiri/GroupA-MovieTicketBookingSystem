@@ -1,42 +1,54 @@
-====================================================
-           CSC 1031 - PROGRAMMING PROJECT
-              GROUP SUBMISSION DETAILS
-====================================================
+================================================================================
+                    COURSEWORK GROUP PROJECT SUBMISSION
+================================================================================
 
-Project Name: Movie Ticket Booking System
-Group: Group A
-GitHub Repository URL: https://github.com/charan-arunagiri/GroupA-MovieTicketBookingSystem
+Course Code    : CSC 1031
+Course Title   : Computer Science Assignment
+Project Title  : Movie Ticket Booking System in C
+Repository URL : https://github.com/charan-arunagiri/GroupA-MovieTicketBookingSystem
 
-----------------------------------------------------
-MEMBER INFORMATION & ROLES
-----------------------------------------------------
+--------------------------------------------------------------------------------
+1. TEAM MEMBERS & CONTRIBUTIONS
+--------------------------------------------------------------------------------
 
-1. Member 1 (Project Manager & Documentation Lead)
-   Name: Charan Arunagiri
-   Student ID: AS20250385
-   Contributions:
-   - GitHub Repository & Projects Board setup
-   - Task allocation & workflow management
-   - Documentation (README) & LMS submission preparation
-   - Project Report assembly & written intro
+1. Charan (Lead & Core System Architecture)
+   - Student ID : [Your Student ID]
+   - Key Modules: System Architecture, Base Data Structures, Main Menu Navigation, 
+                  Showtimes View, Interactive Seat Map (viewSeatMap), Dynamic 
+                  Booking Engine (bookATicket), Price Logic (calculatePrice).
 
-2. Member 2 (Lead Software Developer)
-   Name: Priyanka Shireetharran
-   Student ID: AS20250645
-   Contributions:
-   - Core C programming architecture
-   - Implementation of menu options, logic, and structs
-   - Input validation and memory management
+2. Priyanka (Booking Management Specialist)
+   - Student ID : [Priyanka's Student ID]
+   - Key Modules: Ticket Cancellation & Refund Logic (cancelBooking), Search & 
+                  Lookup Engine (searchBooking), String Utility Helper 
+                  (containsIgnoreCase).
 
-3. Member 3 (QA & Software Testing Lead)
-   Name: Wageesha sachinthani 
-   Student ID: AS20250641
-   Contributions:
-   - Manual program dry-running and test execution
-   - Edge case identification (invalid inputs, boundary seating)
-   - Visual evidence capture (execution screenshots)
-   - Test Plan Matrix validation & verification
+3. Wageesha (Financial Analytics Lead)
+   - Student ID : [Wageesha's Student ID]
+   - Key Modules: Cinema Financial Analytics Engine & Comprehensive Revenue 
+                  Report Generator (showRevenue).
 
-====================================================
-Submitted for CSC 1031 Assessment
-====================================================
+--------------------------------------------------------------------------------
+2. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+The Movie Ticket Booking System is an in-memory command-line interface (CLI) 
+application built in C. It provides end-to-end functionality for viewing showtimes, 
+interactive seating grid displays across 3 pricing tiers (Regular, Premium, VIP), 
+automated student/senior/group discounts, ticket cancellation with refund 
+calculation, reservation searching, and detailed revenue analytics.
+
+--------------------------------------------------------------------------------
+3. COMPILATION & EXECUTION INSTRUCTIONS
+--------------------------------------------------------------------------------
+Compiler: GCC / Clang (Standard C Library)
+
+- Compilation (All Platforms):
+  gcc main.c -o booking
+
+- Execution (Linux / macOS):
+  ./booking
+
+- Execution (Windows):
+  booking.exe
+
+================================================================================
