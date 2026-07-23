@@ -44,9 +44,7 @@ void viewSeatMap();
 void bookATicket();
 void cancelBooking();
 void searchBooking();
-
-// Stub for Wageesha's upcoming Revenue module
-void showRevenue() { printf("\n[Revenue Report module coming next!]\n"); }
+void showRevenue();
 
 // --- Main Function ---
 int main() {
@@ -577,4 +575,67 @@ void searchBooking() {
     } else {
         printf("Error: Invalid choice.\n");
     }
+}
+
+// --- Menu Option 6: Revenue Report ---
+void showRevenue() {
+    int totalSeatsAvailable = NUM_MOVIES * NUM_SHOWTIMES * NUM_ROWS * NUM_COLS;
+    int totalSeatsBooked = 0;
+    float totalRevenue = 0.0f;
+
+    int regularBooked = 0, premiumBooked = 0, vipBooked = 0;
+    float regularRevenue = 0.0f, premiumRevenue = 0.0f, vipRevenue = 0.0f;
+
+    printf("\n=========================================================\n");
+    printf("               FINANCIAL & REVENUE REPORT                \n");
+    printf("=========================================================\n");
+
+    for (int m = 0; m < NUM_MOVIES; m++) {
+        float movieRevenue = 0.0f;
+        int movieBooked = 0;
+
+        for (int s = 0; s < NUM_SHOWTIMES; s++) {
+            for (int r = 0; r < NUM_ROWS; r++) {
+                for (int c = 0; c < NUM_COLS; c++) {
+                    if (movies[m].showtimes[s].seats[r][c].booked) {
+                        float price = movies[m].showtimes[s].seats[r][c].pricePaid;
+                        totalSeatsBooked++;
+                        movieBooked++;
+                        totalRevenue += price;
+                        movieRevenue += price;
+
+                        if (r == 4) { // VIP
+                            vipBooked++;
+                            vipRevenue += price;
+                        } else if (r >= 2) { // Premium
+                            premiumBooked++;
+                            premiumRevenue += price;
+                        } else { // Regular
+                            regularBooked++;
+                            regularRevenue += price;
+                        }
+                    }
+                }
+            }
+        }
+
+        printf("Movie: %-18s | Tickets Sold: %2d | Revenue: Rs. %.2f\n",
+               movies[m].title, movieBooked, movieRevenue);
+    }
+
+    float occupancyRate = ((float)totalSeatsBooked / totalSeatsAvailable) * 100.0f;
+
+    printf("---------------------------------------------------------\n");
+    printf("               TIER BREAKDOWN & SUMMARY                  \n");
+    printf("---------------------------------------------------------\n");
+    printf("Regular Tier (Rows A-B): %2d sold | Revenue: Rs. %.2f\n", regularBooked, regularRevenue);
+    printf("Premium Tier (Rows C-D): %2d sold | Revenue: Rs. %.2f\n", premiumBooked, premiumRevenue);
+    printf("VIP Tier     (Row E)   : %2d sold | Revenue: Rs. %.2f\n", vipBooked, vipRevenue);
+    printf("---------------------------------------------------------\n");
+    printf("Total Capacity:          %d seats\n", totalSeatsAvailable);
+    printf("Total Tickets Sold:      %d seats\n", totalSeatsBooked);
+    printf("Occupancy Rate:          %.2f%%\n", occupancyRate);
+    printf("=========================================================\n");
+    printf("TOTAL GROSS REVENUE:     Rs. %.2f\n", totalRevenue);
+    printf("=========================================================\n");
 }
