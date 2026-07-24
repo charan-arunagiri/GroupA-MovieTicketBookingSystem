@@ -12,19 +12,19 @@ Repository URL : https://github.com/charan-arunagiri/GroupA-MovieTicketBookingSy
 --------------------------------------------------------------------------------
 
 1. Charan (Lead & Core System Architecture)
-   - Student ID : [Your Student ID]
+   - Student ID : [AS20250385]
    - Key Modules: System Architecture, Base Data Structures, Main Menu Navigation, 
                   Showtimes View, Interactive Seat Map (viewSeatMap), Dynamic 
                   Booking Engine (bookATicket), Price Logic (calculatePrice).
 
 2. Priyanka (Booking Management Specialist)
-   - Student ID : [Priyanka's Student ID]
+   - Student ID : [AS20250645]
    - Key Modules: Ticket Cancellation & Refund Logic (cancelBooking), Search & 
                   Lookup Engine (searchBooking), String Utility Helper 
                   (containsIgnoreCase).
 
 3. Wageesha (Financial Analytics Lead)
-   - Student ID : [Wageesha's Student ID]
+   - Student ID : [AS20250641]
    - Key Modules: Cinema Financial Analytics Engine & Comprehensive Revenue 
                   Report Generator (showRevenue).
 
