@@ -63,6 +63,6 @@ gcc main.c -o booking
 
 ---
 
-## 📜 Course Info
+##  Course Info
 * **Course:** CSC 1031 - Computer Science Assignment
 * **Language:** C (Standard C Library)
