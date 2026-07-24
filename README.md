@@ -4,7 +4,7 @@ An in-memory command-line interface (CLI) application built in C for managing mo
 
 ---
 
-## 👥 Team Contributions
+##  Team Contributions
 
 | Team Member | Module / Role | Key Implementation |
 | :--- | :--- | :--- |
@@ -14,22 +14,22 @@ An in-memory command-line interface (CLI) application built in C for managing mo
 
 ---
 
-## ✨ Features
+##  Features
 
-* 🎟️ **Movie Schedule Management:** View available movies and their screening times.
-* 💺 **Interactive Seat Map:** Visual 5x10 grid display showing real-time seat availability across tiers.
-* 💰 **Dynamic Tier Pricing & Discounts:**
+*  **Movie Schedule Management:** View available movies and their screening times.
+*  **Interactive Seat Map:** Visual 5x10 grid display showing real-time seat availability across tiers.
+*  **Dynamic Tier Pricing & Discounts:**
   * **Regular Tier (Rows A–B):** Base pricing for standard seats.
   * **Premium Tier (Rows C–D):** Middle seating tier.
   * **VIP Tier (Row E):** Top-tier seating.
   * **Discounts:** Student (10%), Senior Citizen (20%), Group Discount (10% off base price when booking 4+ seats).
-* ❌ **Booking Cancellation:** Release booked seats dynamically and auto-calculate refund amounts.
-* 🔍 **Search Engine:** Search active reservations by customer name or seat number.
-* 📊 **Revenue Reporting:** Breakdown of total tickets sold, revenue by movie, and overall earnings.
+*  **Booking Cancellation:** Release booked seats dynamically and auto-calculate refund amounts.
+*  **Search Engine:** Search active reservations by customer name or seat number.
+*  **Revenue Reporting:** Breakdown of total tickets sold, revenue by movie, and overall earnings.
 
 ---
 
-## 🛠️ Data Architecture
+##  Data Architecture
 
 ```text
 Movie (3 Movies)
@@ -44,14 +44,14 @@ Movie (3 Movies)
 
 ---
 
-## 🚀 How to Compile & Run
+##  How to Compile & Run
 
-### ⚙️ Compilation (All Platforms)
+###  Compilation (All Platforms)
 ```bash
 gcc main.c -o booking
 ```
 
-### ▶️ Execution
+###  Execution
 * **Linux / macOS (Terminal):**
   ```bash
   ./booking
